@@ -3,6 +3,11 @@ My Benchopt Benchmark
 =====================
 |Build Status| |Python 3.6+|
 
+.. warning::
+    This benchmark is under development and it only run with a dev version of
+    benchopt, from this PR: https://github.com/benchopt/benchopt/pull/511
+
+
 Benchopt is a package to simplify and make more transparent and
 reproducible the comparisons of optimization algorithms.
 This benchmark is dedicated to solver of **describe your problem**:
