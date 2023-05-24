@@ -34,4 +34,3 @@ class Solver(GSSolver):
         return LogisticRegression(
             penalty=self.penalty, solver=solver, l1_ratio=l1_ratio
         )
-

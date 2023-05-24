@@ -1,6 +1,5 @@
-
-My Benchopt Benchmark
-=====================
+Benchmark for classification methods
+====================================
 |Build Status| |Python 3.6+|
 
 .. warning::
@@ -10,7 +9,7 @@ My Benchopt Benchmark
 
 Benchopt is a package to simplify and make more transparent and
 reproducible the comparisons of optimization algorithms.
-This benchmark is dedicated to solver of **describe your problem**:
+This benchmark is dedicated to **tabular classification methods**:
 
 
 $$\\min_{w} f(X, w)$$
