@@ -6,11 +6,14 @@ with safe_import_context() as import_ctx:
 
 class Solver(GSSolver):
 
-    name='XGBoost'
+
+    name = 'XGBoost'
+
+    requirements = ['py-xgboost']
 
     parameter_grid = {
-        'n_estimators' : [1000, 2000, 5000],
-        'max_depth' : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        'n_estimators': [100, 1000, 2000],
+        'max_depth': range(1, 12)
     }
 
     def get_model(self):
