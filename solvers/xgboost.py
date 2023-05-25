@@ -4,8 +4,8 @@ from benchmark_utils.gridsearch_solver import GSSolver
 with safe_import_context() as import_ctx:
     from xgboost import XGBClassifier
 
-class Solver(GSSolver):
 
+class Solver(GSSolver):
 
     name = 'XGBoost'
 

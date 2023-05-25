@@ -4,8 +4,8 @@ from benchmark_utils.gridsearch_solver import GSSolver
 with safe_import_context() as import_ctx:
     from sklearn.ensemble import HistGradientBoostingClassifier
 
-class Solver(GSSolver):
 
+class Solver(GSSolver):
 
     name = 'HistGradientBoostingClassifier'
 
@@ -16,4 +16,3 @@ class Solver(GSSolver):
 
     def get_model(self):
         return HistGradientBoostingClassifier()
-    
