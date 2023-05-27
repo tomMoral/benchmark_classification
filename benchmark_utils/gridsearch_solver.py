@@ -6,6 +6,9 @@ from benchopt.stopping_criterion import SingleRunCriterion
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from sklearn.model_selection import GridSearchCV
+    from sklearn.pipeline import Pipeline
+    from sklearn.compose import ColumnTransformer
+    from sklearn.preprocessing import OneHotEncoder
 
 
 # The benchmark solvers must be named `Solver` and
@@ -14,15 +17,21 @@ class GSSolver(BaseSolver):
 
     stopping_criterion = SingleRunCriterion()
 
-    def set_objective(self, X, y):
+    def set_objective(self, X, y, categorical_indicator):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
         self.X, self.y = X, y
+        self.categorical_indicator = categorical_indicator
+        preprocessor = ColumnTransformer([("one_hot", OneHotEncoder(categories="auto", handle_unknown="ignore"),
+                                    [i for i in range(self.X.shape[1]) if self.categorical_indicator[i]]),
+                                    ("numerical", "passthrough",
+                                    [i for i in range(self.X.shape[1]) if not self.categorical_indicator[i]])])
+        model = Pipeline(steps=[("preprocessor", preprocessor), ("model", self.get_model())])
         self.clf = GridSearchCV(
-            self.get_model(), self.parameter_grid
+            model, self.parameter_grid
         )
 
     def run(self, n_iter):
