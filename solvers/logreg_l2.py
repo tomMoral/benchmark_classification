@@ -20,7 +20,7 @@ class Solver(GSSolver):
     }
 
     parameter_grid = {
-        'C': [10, 1, .1]
+        'model__C': [10, 1, .1]
     }
 
     def get_model(self):

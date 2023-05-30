@@ -12,8 +12,8 @@ class Solver(GSSolver):
     requirements = ['py-xgboost']
 
     parameter_grid = {
-        'n_estimators': [100, 1000, 2000],
-        'max_depth': range(1, 12)
+        'model__n_estimators': [100, 1000, 2000],
+        'model__max_depth': range(1, 12)
     }
 
     def get_model(self):

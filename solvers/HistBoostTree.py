@@ -10,8 +10,8 @@ class Solver(GSSolver):
     name = 'HistGradientBoostingClassifier'
 
     parameter_grid = {
-        'max_iter': [100, 1000, 2000],
-        'learning_rate': [0.1, 0.2, 0.5, 1]
+        'model__max_iter': [100, 1000, 2000],
+        'model__learning_rate': [0.1, 0.2, 0.5, 1]
     }
 
     def get_model(self):
