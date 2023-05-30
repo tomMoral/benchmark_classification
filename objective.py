@@ -64,7 +64,7 @@ class Objective(BaseObjective):
     def get_one_solution(self):
         # Return one solution. The return value should be an object compatible
         # with `self.compute`. This is mainly for testing purposes.
-        return DummyClassifier().fit(self.X, self.y)
+        return DummyClassifier().fit(self.X_train, self.y_train)
 
     def get_objective(self):
         # Define the information to pass to each solver to run the benchmark.
