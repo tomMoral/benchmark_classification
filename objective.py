@@ -46,7 +46,7 @@ class Objective(BaseObjective):
         score_train = model.score(self.X_train, self.y_train)
         score_test = model.score(self.X_test, self.y_test)
         bl_acc = BAS(self.y_test, model.predict(self.X_test))
-        pred = model.predict(self.X_test)
+        pred = model.predict_proba(self.X_test)
         if len(np.unique(self.y_test)) > 2:
             roc_score = RAS(self.y_test, pred, multi_class='ovr')
         else:

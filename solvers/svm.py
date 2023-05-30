@@ -20,4 +20,4 @@ class Solver(GSSolver):
     }
 
     def get_model(self):
-        return SVC()
+        return SVC(probability=True)
