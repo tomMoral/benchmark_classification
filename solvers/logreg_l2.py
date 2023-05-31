@@ -6,6 +6,7 @@ from benchmark_utils.gridsearch_solver import GSSolver
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from sklearn.linear_model import LogisticRegression
+    from optuna.distributions import FloatDistribution
 
 
 # The benchmark solvers must be named `Solver` and
@@ -20,7 +21,7 @@ class Solver(GSSolver):
     }
 
     parameter_grid = {
-        'model__C': [10, 1, .1]
+        'model__C': FloatDistribution(1e-2, 1e2, log=True)
     }
 
     def get_model(self):

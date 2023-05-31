@@ -3,6 +3,7 @@ from benchmark_utils.gridsearch_solver import GSSolver
 
 with safe_import_context() as import_ctx:
     from sklearn.ensemble import HistGradientBoostingClassifier
+    from optuna.distributions import IntDistribution, FloatDistribution
 
 
 class Solver(GSSolver):
@@ -10,8 +11,8 @@ class Solver(GSSolver):
     name = 'HistGradientBoostingClassifier'
 
     parameter_grid = {
-        'model__max_iter': [100, 1000, 2000],
-        'model__learning_rate': [0.1, 0.2, 0.5, 1]
+        'model__max_iter': IntDistribution(100, 2000, step=10),
+        'model__learning_rate': FloatDistribution(1e-1, 1, log=True)
     }
 
     def get_model(self):

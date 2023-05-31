@@ -9,6 +9,8 @@ with safe_import_context() as import_ctx:
     from sklearn.pipeline import Pipeline
     from sklearn.compose import ColumnTransformer
     from sklearn.preprocessing import OneHotEncoder as OHE
+    import optuna
+    from optuna.integration import OptunaSearchCV
 
 
 # The benchmark solvers must be named `Solver` and
@@ -38,9 +40,10 @@ class GSSolver(BaseSolver):
                 )
         gm = self.get_model()
         model = Pipeline(steps=[("preprocessor", preprocessor), ("model", gm)])
-        self.clf = GridSearchCV(
-            model, self.parameter_grid
-        )
+        sampler = optuna.samplers.RandomSampler()
+        pruner = optuna.pruners.MedianPruner()
+        study = optuna.create_study(direction="maximize", sampler=sampler, pruner=pruner)
+        self.clf = OptunaSearchCV(model, self.parameter_grid, n_trials=100, study=study)
 
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver.

@@ -6,6 +6,7 @@ from benchmark_utils.gridsearch_solver import GSSolver
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from sklearn.svm import SVC
+    from optuna.distributions import FloatDistribution, CategoricalDistribution
 
 
 # The benchmark solvers must be named `Solver` and
@@ -16,7 +17,8 @@ class Solver(GSSolver):
     name = 'SVM'
 
     parameter_grid = {
-        'model__C': [10, 1, .1]
+        'model__C':FloatDistribution(1e-10, 1, log=True),
+        'model__kernel' : CategoricalDistribution(choices=("linear", "poly", "rbf"))
     }
 
     def get_model(self):
