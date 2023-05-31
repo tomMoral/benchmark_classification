@@ -10,7 +10,7 @@ class Solver(GSSolver):
 
     name = 'XGBoost'
 
-    requirements = ['py-xgboost']
+    requirements = ['py-xgboost', 'pip:optuna']
 
     parameter_grid = {
         'model__n_estimators': IntDistribution(100, 2000, step=10),

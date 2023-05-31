@@ -10,6 +10,8 @@ class Solver(GSSolver):
 
     name = 'HistGradientBoostingClassifier'
 
+    requirements = ['pip:optuna']
+
     parameter_grid = {
         'model__max_iter': IntDistribution(100, 2000, step=10),
         'model__learning_rate': FloatDistribution(1e-1, 1, log=True)

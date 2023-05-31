@@ -16,6 +16,8 @@ class Solver(GSSolver):
     # Name to select the solver in the CLI and to display the results.
     name = 'logreg_l2'
 
+    requirements = ['pip:optuna']
+
     parameters = {
         'penalty': ['l1', 'l2', 'elasticnet'],
     }

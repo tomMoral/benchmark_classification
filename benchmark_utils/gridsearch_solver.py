@@ -5,12 +5,12 @@ from benchopt.stopping_criterion import SingleRunCriterion
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
-    from sklearn.model_selection import GridSearchCV
     from sklearn.pipeline import Pipeline
     from sklearn.compose import ColumnTransformer
     from sklearn.preprocessing import OneHotEncoder as OHE
     import optuna
-    from optuna.integration import OptunaSearchCV
+    from optuna.study import create_study
+    from optuna.integration import OptunaSearchCV as OCV
 
 
 # The benchmark solvers must be named `Solver` and
@@ -40,10 +40,10 @@ class GSSolver(BaseSolver):
                 )
         gm = self.get_model()
         model = Pipeline(steps=[("preprocessor", preprocessor), ("model", gm)])
-        sampler = optuna.samplers.RandomSampler()
-        pruner = optuna.pruners.MedianPruner()
-        study = optuna.create_study(direction="maximize", sampler=sampler, pruner=pruner)
-        self.clf = OptunaSearchCV(model, self.parameter_grid, n_trials=100, study=study)
+        sampl = optuna.samplers.RandomSampler()
+        pru = optuna.pruners.MedianPruner()
+        study = create_study(direction="maximize", sampler=sampl, pruner=pru)
+        self.clf = OCV(model, self.parameter_grid, n_trials=100, study=study)
 
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver.

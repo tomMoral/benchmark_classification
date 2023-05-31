@@ -10,6 +10,8 @@ class Solver(GSSolver):
 
     name = 'RandomForest'
 
+    requirements = ['pip:optuna']
+
     parameter_grid = {'model__n_estimators': IntDistribution(10, 200, step=10)}
 
     def get_model(self):
