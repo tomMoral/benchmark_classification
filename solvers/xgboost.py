@@ -3,7 +3,7 @@ from benchmark_utils.gridsearch_solver import GSSolver
 
 with safe_import_context() as import_ctx:
     from xgboost import XGBClassifier
-    from optuna.distributions import IntDistribution
+    import optuna
 
 
 class Solver(GSSolver):
@@ -12,10 +12,13 @@ class Solver(GSSolver):
 
     requirements = ['py-xgboost', 'pip:optuna']
 
-    parameter_grid = {
-        'model__n_estimators': IntDistribution(100, 2000, step=10),
-        'model__max_depth': IntDistribution(1, 11, step=1)
-    }
-
     def get_model(self):
         return XGBClassifier()
+
+    def sample_parameters(self, trial):
+        n_estimators = trial.suggest_int("n_estimators", 10, 2000, step=10)
+        max_depth = trial.suggest_int("max_depth", 1, 11, step=1)
+        return dict(
+            model__n_estimators=n_estimators,
+            model__max_depth=max_depth,
+        )

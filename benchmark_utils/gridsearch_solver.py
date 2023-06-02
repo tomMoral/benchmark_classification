@@ -1,33 +1,34 @@
 from benchopt import BaseSolver, safe_import_context
-from benchopt.stopping_criterion import SingleRunCriterion
+from benchopt.stopping_criterion import SufficientProgressCriterion
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
+    import optuna
     from sklearn.pipeline import Pipeline
     from sklearn.compose import ColumnTransformer
     from sklearn.preprocessing import OneHotEncoder as OHE
-    import optuna
-    from optuna.study import create_study
-    from optuna.integration import OptunaSearchCV as OCV
+    from sklearn.metrics import accuracy_score
+    from sklearn.dummy import DummyClassifier
 
 
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 class GSSolver(BaseSolver):
 
-    stopping_criterion = SingleRunCriterion()
+    stopping_criterion = SufficientProgressCriterion(strategy='callback')
 
-    def set_objective(self, X, y, categorical_indicator):
+    def set_objective(self, X_train, y_train, X_test, y_test, categorical_indicator):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        self.X, self.y = X, y
+        self.X_train, self.y_train = X_train, y_train
+        self.X_test, self.y_test = X_test, y_test
         self.cat_ind = categorical_indicator
-        size = self.X.shape[1]
+        size = self.X_train.shape[1]
         preprocessor = ColumnTransformer(
                     [("one_hot", OHE(categories="auto",
                                      handle_unknown="ignore"),
@@ -39,24 +40,32 @@ class GSSolver(BaseSolver):
                     )]
                 )
         gm = self.get_model()
-        model = Pipeline(steps=[("preprocessor", preprocessor), ("model", gm)])
-        sampl = optuna.samplers.RandomSampler()
-        pru = optuna.pruners.MedianPruner()
-        study = create_study(direction="maximize", sampler=sampl, pruner=pru)
-        self.clf = OCV(model, self.parameter_grid, n_trials=100, study=study)
+        self.model = Pipeline(steps=[("preprocessor", preprocessor), ("model", gm)])
+
+    def objective(self, trial):
+        model = self.model.set_params(**self.sample_parameters(trial))
+        model.fit(self.X_train, self.y_train)
+        y_pred = model.predict(self.X_test)
+        accuracy = accuracy_score(self.y_test, y_pred)
+
+        return accuracy
 
     def run(self, n_iter):
         # This is the function that is called to evaluate the solver.
         # It runs the algorithm for a given a number of iterations `n_iter`.
-
-        self.clf.fit(self.X, self.y)
+        sampler = optuna.samplers.RandomSampler()
+        study = optuna.create_study(direction="maximize", sampler=sampler)
+        study.optimize(self.objective, n_trials=3)
+        best = {"model__"+param : values for param, values in study.best_params.items()}
+        self.clf = self.model.set_params(**best)
+        self.clf.fit(self.X_train, self.y_train)
 
     def get_result(self):
         # Return the result from one optimization run.
         # The outputs of this function are the arguments of `Objective.compute`
         # This defines the benchmark's API for solvers' results.
         # it is customizable for each benchmark.
-        return self.clf.best_estimator_
+        return self.clf
 
     def warmup_solver(self):
         pass
