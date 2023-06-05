@@ -3,7 +3,6 @@ from benchmark_utils.optuna_solver import OSolver
 
 with safe_import_context() as import_ctx:
     from sklearn.ensemble import RandomForestClassifier
-    import optuna
 
 
 class Solver(OSolver):

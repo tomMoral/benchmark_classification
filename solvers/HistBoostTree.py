@@ -3,7 +3,6 @@ from benchmark_utils.optuna_solver import OSolver
 
 with safe_import_context() as import_ctx:
     from sklearn.ensemble import HistGradientBoostingClassifier
-    import optuna
 
 
 class Solver(OSolver):
@@ -16,7 +15,7 @@ class Solver(OSolver):
 
     def sample_parameters(self, trial):
         max_iter = trial.suggest_int("max_iter", 100, 2000, step=10)
-        l_rate = trial.suggest_int("learning_rate", 1e-1, 1, log=True)
+        l_rate = trial.suggest_int("learning_rate", 1e-1, 1, step=0.1)
         return dict(
             model__max_iter=max_iter,
             model__learning_rate=l_rate
