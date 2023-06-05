@@ -9,6 +9,7 @@ with safe_import_context() as import_ctx:
 class Solver(OSolver):
 
     name = 'HistGradientBoostingClassifier'
+    requirements = ["pip:optuna"]
 
     def get_model(self):
         return HistGradientBoostingClassifier()
