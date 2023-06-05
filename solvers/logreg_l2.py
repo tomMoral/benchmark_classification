@@ -39,5 +39,6 @@ class Solver(OSolver):
 
         return dict(
             C=c,
-            l1_ratio=L1ratio
+            l1_ratio=l1_ratio
+
         )
