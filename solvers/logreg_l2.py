@@ -5,6 +5,7 @@ from benchmark_utils.optuna_solver import OSolver
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
+    import optuna  # noqa: F401
     from sklearn.linear_model import LogisticRegression
 
 
