@@ -16,16 +16,12 @@ class Dataset(BaseDataset):
     }
 
     def get_data(self):
-        rng = np.random.RandomState(self.seed)
         X, y = load_iris(
             return_X_y=True
-        )
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=self.test_size, random_state=rng
         )
         cat_indicator = [False]*X.shape[1]
 
         return dict(
             X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test,
-            categorical_ind=cat_indicator
+            categorical_indicator=cat_indicator
         )

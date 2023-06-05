@@ -35,18 +35,14 @@ class Dataset(BaseDataset):
         # API to pass data. It is customizable for each benchmark.
 
         # Generate pseudorandom data using `numpy`.
-        rng = np.random.RandomState(self.seed)
         X, y, _ = make_correlated_data(self.n_samples, self.n_features)
         y = y > 0
 
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=self.test_size, random_state=rng
-        )
         cat_indicator = [False]*X.shape[1]
 
         # The dictionary defines the keyword arguments for `Objective.set_data`
         return dict(
             X_train=X_train, y_train=y_train,
             X_test=X_test, y_test=y_test,
-            categorical_ind=cat_indicator
+            categorical_indicator=cat_indicator
         )
