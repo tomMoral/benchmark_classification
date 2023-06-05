@@ -1,20 +1,24 @@
 from benchopt import safe_import_context
-from benchmark_utils.gridsearch_solver import GSSolver
+from benchmark_utils.optuna_solver import OSolver
 
 with safe_import_context() as import_ctx:
+    import optuna  # noqa: F401
     from xgboost import XGBClassifier
 
 
-class Solver(GSSolver):
+class Solver(OSolver):
 
     name = 'XGBoost'
 
-    requirements = ['py-xgboost']
-
-    parameter_grid = {
-        'n_estimators': [100, 1000, 2000],
-        'max_depth': range(1, 12)
-    }
+    requirements = ['py-xgboost', 'pip:optuna']
 
     def get_model(self):
         return XGBClassifier()
+
+    def sample_parameters(self, trial):
+        n_estimators = trial.suggest_int("n_estimators", 10, 2000, step=10)
+        max_depth = trial.suggest_int("max_depth", 1, 11, step=1)
+        return dict(
+            n_estimators=n_estimators,
+            max_depth=max_depth,
+        )

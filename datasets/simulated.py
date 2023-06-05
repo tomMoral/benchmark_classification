@@ -42,9 +42,11 @@ class Dataset(BaseDataset):
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=self.test_size, random_state=rng
         )
+        cat_indicator = [False]*X.shape[1]
 
         # The dictionary defines the keyword arguments for `Objective.set_data`
         return dict(
             X_train=X_train, y_train=y_train,
-            X_test=X_test, y_test=y_test
+            X_test=X_test, y_test=y_test,
+            categorical_ind=cat_indicator
         )

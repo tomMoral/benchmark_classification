@@ -5,6 +5,9 @@ from benchopt import BaseObjective, safe_import_context
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     from sklearn.dummy import DummyClassifier
+    from sklearn.metrics import balanced_accuracy_score as BAS
+    from sklearn.metrics import roc_auc_score as RAS
+    import numpy as np
 
 
 # The benchmark objective must be named `Objective` and
@@ -28,12 +31,13 @@ class Objective(BaseObjective):
     # Bump it up if the benchmark depends on a new feature of benchopt.
     min_benchopt_version = "1.3.2"
 
-    def set_data(self, X_train, y_train, X_test, y_test):
+    def set_data(self, X_train, y_train, X_test, y_test, categorical_ind):
         # The keyword arguments of this function are the keys of the dictionary
         # returned by `Dataset.get_data`. This defines the benchmark's
         # API to pass data. This is customizable for each benchmark.
         self.X_train, self.y_train = X_train, y_train
         self.X_test, self.y_test = X_test, y_test
+        self.categorical_indicator = categorical_ind
 
     def compute(self, model):
         # The arguments of this function are the outputs of the
@@ -41,12 +45,20 @@ class Objective(BaseObjective):
         # solvers' result. This is customizable for each benchmark.
         score_train = model.score(self.X_train, self.y_train)
         score_test = model.score(self.X_test, self.y_test)
+        bl_acc = BAS(self.y_test, model.predict(self.X_test))
+        pred = model.predict_proba(self.X_test)
+        if len(np.unique(self.y_test)) > 2:
+            roc_score = RAS(self.y_test, pred, multi_class='ovr')
+        else:
+            roc_score = RAS(self.y_test, pred[:, 1])
 
         # This method can return many metrics in a dictionary. One of these
         # metrics needs to be `value` for convergence detection purposes.
         return dict(
             value=score_test,
             score_train=score_train,
+            balanced_accuracy=bl_acc,
+            roc_auc_score=roc_score
         )
 
     def get_one_solution(self):
@@ -61,6 +73,9 @@ class Objective(BaseObjective):
         # benchmark's API for passing the objective to the solver.
         # It is customizable for each benchmark.
         return dict(
-            X=self.X_train,
-            y=self.y_train,
+            X_train=self.X_train,
+            y_train=self.y_train,
+            X_test=self.X_test,
+            y_test=self.y_test,
+            categorical_indicator=self.categorical_indicator
         )
