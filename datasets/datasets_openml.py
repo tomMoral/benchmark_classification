@@ -1,7 +1,6 @@
 from benchopt import BaseDataset, safe_import_context
 
 with safe_import_context() as import_ctx:
-    import numpy as np
     import openml
 
 
@@ -30,8 +29,9 @@ DATASETS = {
     'wine': 44091,
 }
 
+
 class Dataset(BaseDataset):
-    
+
     name = 'openml'
 
     install_cmd = 'conda'
@@ -48,7 +48,7 @@ class Dataset(BaseDataset):
             self.dataset
         )
         X, y, cat_indicator, attribute_names = dataset.get_data(
-            dataset_format="array", target = dataset.default_target_attribute
+            dataset_format="array", target=dataset.default_target_attribute
         )
 
         return dict(

@@ -5,9 +5,6 @@ from benchopt import BaseDataset, safe_import_context
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
-    import numpy as np
-    from sklearn.model_selection import train_test_split
-
     from benchopt.datasets import make_correlated_data
 
 
@@ -42,7 +39,7 @@ class Dataset(BaseDataset):
 
         # The dictionary defines the keyword arguments for `Objective.set_data`
         return dict(
-            X_train=X_train, y_train=y_train,
-            X_test=X_test, y_test=y_test,
+            X=X,
+            y=y,
             categorical_indicator=cat_indicator
         )
