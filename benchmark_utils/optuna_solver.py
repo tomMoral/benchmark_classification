@@ -44,12 +44,16 @@ class OSolver(BaseSolver):
                 )
         gm = self.get_model()
         self.model = Pipeline(
-            steps=[("preprocessor",
-                    preprocessor), ("model", gm)]
+            steps=[("preprocessor", preprocessor),
+                   ("model", gm)]
         )
 
     def objective(self, trial):
-        model = self.model.set_params(**self.sample_parameters(trial))
+        param = self.sample_parameters(trial)
+        params = {
+            f"model__{p}": v for p, v in param.items()
+        }
+        model = self.model.set_params(**params)
         model.fit(self.X_train, self.y_train)
         y_pred = model.predict(self.X_test)
         accuracy = accuracy_score(self.y_test, y_pred)

@@ -19,6 +19,6 @@ class Solver(OSolver):
         n_estimators = trial.suggest_int("n_estimators", 10, 2000, step=10)
         max_depth = trial.suggest_int("max_depth", 1, 11, step=1)
         return dict(
-            model__n_estimators=n_estimators,
-            model__max_depth=max_depth,
+            n_estimators=n_estimators,
+            max_depth=max_depth,
         )

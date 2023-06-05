@@ -18,6 +18,6 @@ class Solver(OSolver):
         max_iter = trial.suggest_int("max_iter", 100, 2000, step=10)
         l_rate = trial.suggest_float("learning_rate", 1e-1, 1, step=0.1)
         return dict(
-            model__max_iter=max_iter,
-            model__learning_rate=l_rate
+            max_iter=max_iter,
+            learning_rate=l_rate
         )

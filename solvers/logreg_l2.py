@@ -35,6 +35,8 @@ class Solver(OSolver):
 
     def sample_parameters(self, trial):
         c = trial.suggest_float("C", 1e-1, 1e1, step=0.2)
+        L1ratio = trial.suggest_float("l1_ratio", 0, 1, step=0.1)
         return dict(
-            model__C=c
+            C=c,
+            l1_ratio=L1ratio
         )

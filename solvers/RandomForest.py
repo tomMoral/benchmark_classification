@@ -17,5 +17,5 @@ class Solver(OSolver):
     def sample_parameters(self, trial):
         n_estimators = trial.suggest_int("n_estimators", 10, 200, step=10)
         return dict(
-            model__n_estimators=n_estimators
+            n_estimators=n_estimators
         )
