@@ -68,7 +68,7 @@ class OSolver(BaseSolver):
                 f"model__{p}": v for p, v in study.best_params.items()
             }
             best_model = self.model.set_params(**best)
-            best_model.fit(self.X_train, self.y_train)
+            self.clf = best_model.fit(self.X_train, self.y_train)
 
     def get_result(self):
         # Return the result from one optimization run.
