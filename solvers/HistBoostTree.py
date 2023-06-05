@@ -1,21 +1,22 @@
 from benchopt import safe_import_context
-from benchmark_utils.gridsearch_solver import GSSolver
+from benchmark_utils.optuna_solver import OSolver
 
 with safe_import_context() as import_ctx:
     from sklearn.ensemble import HistGradientBoostingClassifier
-    from optuna.distributions import IntDistribution, FloatDistribution
+    import optuna
 
 
-class Solver(GSSolver):
+class Solver(OSolver):
 
     name = 'HistGradientBoostingClassifier'
 
-    requirements = ['pip:optuna']
-
-    parameter_grid = {
-        'model__max_iter': IntDistribution(100, 2000, step=10),
-        'model__learning_rate': FloatDistribution(1e-1, 1, log=True)
-    }
-
     def get_model(self):
         return HistGradientBoostingClassifier()
+
+    def sample_parameters(self, trial):
+        max_iter = trial.suggest_int("max_iter", 100, 2000, step=10)
+        l_rate = trial.suggest_int("learning_rate", 1e-1, 1, log=True)
+        return dict(
+            model__max_iter=max_iter,
+            model__learning_rate=l_rate
+        )

@@ -1,12 +1,12 @@
 from benchopt import safe_import_context
-from benchmark_utils.gridsearch_solver import GSSolver
+from benchmark_utils.optuna_solver import OSolver
 
 with safe_import_context() as import_ctx:
     from xgboost import XGBClassifier
     import optuna
 
 
-class Solver(GSSolver):
+class Solver(OSolver):
 
     name = 'XGBoost'
 
