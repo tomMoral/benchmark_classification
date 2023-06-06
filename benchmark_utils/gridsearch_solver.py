@@ -17,13 +17,16 @@ class GSSolver(BaseSolver):
 
     stopping_criterion = SufficientProgressCriterion(strategy='callback')
 
-    def set_objective(self, X, y, categorical_indicator):
+    def set_objective(
+            self, X_train, y_train, X_test, y_test,
+            categorical_indicator
+    ):
         # Define the information received by each solver from the objective.
         # The arguments of this function are the results of the
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        self.X, self.y = X, y
+        self.X, self.y = X_train, y_train
         self.cat_ind = categorical_indicator
         size = self.X.shape[1]
         preprocessor = ColumnTransformer(
