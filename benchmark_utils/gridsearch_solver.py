@@ -30,15 +30,16 @@ class GSSolver(BaseSolver):
         self.cat_ind = categorical_indicator
         size = self.X.shape[1]
         preprocessor = ColumnTransformer(
-                    [("one_hot", OHE(categories="auto",
-                                     handle_unknown="ignore"),
-                     [i for i in range(size) if self.cat_ind[i]]),
-                     (
-                        "numerical",
-                        "passthrough",
-                        [i for i in range(size) if not self.cat_ind[i]],
-                    )]
-                )
+            [("one_hot", OHE(categories="auto",
+                             handle_unknown="ignore"),
+             [i for i in range(size) if self.cat_ind[i]]),
+             (
+                "numerical",
+                "passthrough",
+                [i for i in range(size) if not self.cat_ind[i]],
+            )]
+        )
+
         gm = self.get_model()
         model = Pipeline(steps=[("preprocessor", preprocessor), ("model", gm)])
         self.clf = GridSearchCV(
