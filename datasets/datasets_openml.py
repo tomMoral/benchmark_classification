@@ -38,8 +38,6 @@ class Dataset(BaseDataset):
     requirements = ["pip:openml", "pip:chardet"]
 
     parameters = {
-        "test_size": [0.25],
-        "seed": [42],
         "dataset": list(DATASETS),
     }
 

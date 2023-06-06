@@ -8,11 +8,6 @@ class Dataset(BaseDataset):
 
     name = "iris"
 
-    parameters = {
-        'test_size': [0.25],
-        'seed': [27]
-    }
-
     def get_data(self):
         X, y = load_iris(
             return_X_y=True

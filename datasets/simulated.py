@@ -22,8 +22,6 @@ class Dataset(BaseDataset):
             (1000, 500),
             (5000, 200),
         ],
-        'test_size': [0.25],
-        'seed': [27],
     }
 
     def get_data(self):
