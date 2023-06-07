@@ -15,7 +15,6 @@ with safe_import_context() as import_ctx:
     import numpy as np
 
 
-
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 class OSolver(BaseSolver):
