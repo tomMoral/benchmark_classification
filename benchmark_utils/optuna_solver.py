@@ -9,7 +9,7 @@ with safe_import_context() as import_ctx:
     from sklearn.pipeline import Pipeline
     from sklearn.compose import ColumnTransformer
     from sklearn.preprocessing import OneHotEncoder as OHE
-    from sklearn.metrics import accuracy_score
+    from sklearn.model_selection import cross_validate
     from sklearn.dummy import DummyClassifier
 
 
@@ -54,11 +54,10 @@ class OSolver(BaseSolver):
             f"model__{p}": v for p, v in param.items()
         }
         model = self.model.set_params(**params)
-        model.fit(self.X_train, self.y_train)
-        y_pred = model.predict(self.X_test)
-        accuracy = accuracy_score(self.y_test, y_pred)
+        cross_score = cross_validate(model, self.X_train, self.y_train)['test_score']
+        trial.set_user_attr('model', model)
 
-        return accuracy
+        return cross_score.mean()
 
     def run(self, callback):
         # This is the function that is called to evaluate the solver.
@@ -68,11 +67,10 @@ class OSolver(BaseSolver):
         study = optuna.create_study(direction="maximize", sampler=sampler)
         while callback(best_model):
             study.optimize(self.objective, n_trials=10)
-            best = {
-                f"model__{p}": v for p, v in study.best_params.items()
-            }
-            best_model = self.model.set_params(**best)
-            self.clf = best_model.fit(self.X_train, self.y_train)
+            best_model = study.best_trial.user_attrs['model'].fit(
+                self.X_train, self.y_train
+            )
+        self.clf = best_model
 
     def get_result(self):
         # Return the result from one optimization run.

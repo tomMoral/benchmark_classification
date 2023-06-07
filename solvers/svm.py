@@ -22,7 +22,7 @@ class Solver(OSolver):
         return SVC(probability=True)
 
     def sample_parameters(self, trial):
-        c = trial.suggest_float("C", 1e-1, 1e1, step=0.1)
+        c = trial.suggest_float("C", 1e-1, 1e1, log=True)
         return dict(
             C=c
         )

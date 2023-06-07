@@ -16,7 +16,7 @@ class Solver(OSolver):
 
     def sample_parameters(self, trial):
         max_iter = trial.suggest_int("max_iter", 100, 2000, step=10)
-        l_rate = trial.suggest_float("learning_rate", 1e-1, 1, step=0.1)
+        l_rate = trial.suggest_float("learning_rate", 1e-1, 1, log=True)
         return dict(
             max_iter=max_iter,
             learning_rate=l_rate
