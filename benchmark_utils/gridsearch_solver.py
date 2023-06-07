@@ -18,7 +18,7 @@ class GSSolver(BaseSolver):
     stopping_criterion = SufficientProgressCriterion(strategy='callback')
 
     def set_objective(
-            self, X_train, y_train, X_test, y_test,
+            self, X_train, y_train,
             categorical_indicator
     ):
         # Define the information received by each solver from the objective.

@@ -11,6 +11,9 @@ with safe_import_context() as import_ctx:
     from sklearn.preprocessing import OneHotEncoder as OHE
     from sklearn.metrics import accuracy_score
     from sklearn.dummy import DummyClassifier
+    from sklearn.model_selection import train_test_split
+    import numpy as np
+
 
 
 # The benchmark solvers must be named `Solver` and
@@ -20,7 +23,7 @@ class OSolver(BaseSolver):
     stopping_criterion = SufficientProgressCriterion(strategy='callback')
 
     def set_objective(
-            self, X_train, y_train, X_test, y_test,
+            self, X_train, y_train,
             categorical_indicator
     ):
         # Define the information received by each solver from the objective.
@@ -28,8 +31,12 @@ class OSolver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        self.X_train, self.y_train = X_train, y_train
-        self.X_test, self.y_test = X_test, y_test
+        rng = np.random.RandomState(42)
+        X, X_val, y, y_val = train_test_split(
+            X_train, y_train, test_size=0.25, random_state=rng
+        )
+        self.X_train, self.y_train = X, y
+        self.X_test, self.y_test = X_val, y_val
         self.cat_ind = categorical_indicator
         size = self.X_train.shape[1]
         preprocessor = ColumnTransformer(
