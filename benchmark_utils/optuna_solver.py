@@ -54,7 +54,9 @@ class OSolver(BaseSolver):
             f"model__{p}": v for p, v in param.items()
         }
         model = self.model.set_params(**params)
-        cross_score = cross_validate(model, self.X_train, self.y_train)['test_score']
+        cross_score = cross_validate(
+            model, self.X_train, self.y_train
+        )['test_score']
         trial.set_user_attr('model', model)
 
         return cross_score.mean()
