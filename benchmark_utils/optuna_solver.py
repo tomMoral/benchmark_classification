@@ -21,6 +21,11 @@ class OSolver(BaseSolver):
 
     stopping_criterion = SufficientProgressCriterion(strategy='callback')
 
+    params = {
+        'test_size': 0.25,
+        'seed': 42,
+    }
+
     def set_objective(
             self, X_train, y_train,
             categorical_indicator
@@ -30,9 +35,10 @@ class OSolver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        rng = np.random.RandomState(42)
+        rng = np.random.RandomState(self.params['seed'])
         X, X_val, y, y_val = train_test_split(
-            X_train, y_train, test_size=0.25, random_state=rng
+            X_train, y_train, test_size=self.params['test_size'],
+            random_state=rng
         )
         self.X_train, self.y_train = X, y
         self.X_test, self.y_test = X_val, y_val
