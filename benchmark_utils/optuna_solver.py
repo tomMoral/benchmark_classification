@@ -5,6 +5,7 @@ from benchopt.stopping_criterion import SufficientProgressCriterion
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
+    import numpy as np
     import optuna
     from sklearn.pipeline import Pipeline
     from sklearn.compose import ColumnTransformer
@@ -12,7 +13,6 @@ with safe_import_context() as import_ctx:
     from sklearn.metrics import accuracy_score
     from sklearn.dummy import DummyClassifier
     from sklearn.model_selection import train_test_split
-    import numpy as np
 
 
 # The benchmark solvers must be named `Solver` and
@@ -41,7 +41,7 @@ class OSolver(BaseSolver):
             random_state=rng
         )
         self.X_train, self.y_train = X, y
-        self.X_test, self.y_test = X_val, y_val
+        self.X_val, self.y_val = X_val, y_val
         self.cat_ind = categorical_indicator
         size = self.X_train.shape[1]
         preprocessor = ColumnTransformer(

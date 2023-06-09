@@ -1,5 +1,5 @@
 from benchopt import BaseSolver, safe_import_context
-from benchopt.stopping_criterion import SufficientProgressCriterion
+from benchopt.stopping_criterion import SingleRunCriterion
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
@@ -15,7 +15,7 @@ with safe_import_context() as import_ctx:
 # inherit from `BaseSolver` for `benchopt` to work properly.
 class GSSolver(BaseSolver):
 
-    stopping_criterion = SufficientProgressCriterion(strategy='callback')
+    stopping_criterion = SingleRunCriterion()
 
     def set_objective(
             self, X_train, y_train,
