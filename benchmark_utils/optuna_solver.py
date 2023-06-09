@@ -20,7 +20,7 @@ with safe_import_context() as import_ctx:
 class OSolver(BaseSolver):
 
     stopping_criterion = SufficientProgressCriterion(
-        strategy='callback', patience=5
+        strategy='callback'
     )
 
     def set_objective(
@@ -88,6 +88,7 @@ class OSolver(BaseSolver):
     def warmup_solver(self):
         pass
 
+
 class AvgClf(OSolver):
     def __init__(self, estimators):
         self.estimators = estimators
@@ -112,9 +113,9 @@ class AvgClf(OSolver):
 
     def score(self, X, y):
         cpt = 0
-        l = y.shape
+        length = y.shape
         y_pred = self.predict(X)
-        for i in range(l[0]):
+        for i in range(length[0]):
             if y[i] == y_pred[i]:
                 cpt += 1
-        return cpt/l[0]
+        return cpt/length[0]
