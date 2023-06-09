@@ -11,13 +11,17 @@ with safe_import_context() as import_ctx:
     from sklearn.preprocessing import OneHotEncoder as OHE
     from sklearn.model_selection import cross_validate
     from sklearn.dummy import DummyClassifier
+    import numpy as np
+    from scipy import stats
 
 
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 class OSolver(BaseSolver):
 
-    stopping_criterion = SufficientProgressCriterion(strategy='callback')
+    stopping_criterion = SufficientProgressCriterion(
+        strategy='callback', patience=5
+    )
 
     def set_objective(
             self, X_train, y_train, X_test, y_test,
@@ -55,11 +59,11 @@ class OSolver(BaseSolver):
         }
         model = self.model.set_params(**params)
         cross_score = cross_validate(
-            model, self.X_train, self.y_train
-        )['test_score']
-        trial.set_user_attr('model', model)
+            model, self.X_train, self.y_train, return_estimator=True
+        )
+        trial.set_user_attr('model', cross_score['estimator'])
 
-        return cross_score.mean()
+        return cross_score['test_score'].mean()
 
     def run(self, callback):
         # This is the function that is called to evaluate the solver.
@@ -69,8 +73,8 @@ class OSolver(BaseSolver):
         study = optuna.create_study(direction="maximize", sampler=sampler)
         while callback(best_model):
             study.optimize(self.objective, n_trials=10)
-            best_model = study.best_trial.user_attrs['model'].fit(
-                self.X_train, self.y_train
+            best_model = AvgClf(
+                study.best_trial.user_attrs['model']
             )
         self.clf = best_model
 
@@ -83,3 +87,34 @@ class OSolver(BaseSolver):
 
     def warmup_solver(self):
         pass
+
+class AvgClf(OSolver):
+    def __init__(self, estimators):
+        self.estimators = estimators
+
+    def predict(self, X_test):
+        y_pred = []
+        for e in self.estimators:
+            y_pred.append(e.predict(X_test))
+        y_pred = np.array(y_pred)
+        y_pred = stats.mode(y_pred, keepdims=True)[0][0]
+
+        return y_pred
+
+    def predict_proba(self, X_test):
+        y_pred = []
+        for e in self.estimators:
+            y_pred.append(e.predict_proba(X_test))
+        y_pred = np.array(y_pred)
+        y_pred = np.mean(y_pred, axis=0)
+
+        return y_pred
+
+    def score(self, X, y):
+        cpt = 0
+        l = y.shape
+        y_pred = self.predict(X)
+        for i in range(l[0]):
+            if y[i] == y_pred[i]:
+                cpt += 1
+        return cpt/l[0]

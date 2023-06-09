@@ -64,10 +64,11 @@ class Objective(BaseObjective):
         # This method can return many metrics in a dictionary. One of these
         # metrics needs to be `value` for convergence detection purposes.
         return dict(
-            value=score_test,
+            score_test=score_test,
             score_train=score_train,
             balanced_accuracy=bl_acc,
-            roc_auc_score=roc_score
+            roc_auc_score=roc_score,
+            value=1-score_test
         )
 
     def get_one_solution(self):
