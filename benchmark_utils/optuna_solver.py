@@ -5,7 +5,6 @@ from benchopt.stopping_criterion import SufficientProgressCriterion
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
-    import numpy as np
     import optuna
     from sklearn.pipeline import Pipeline
     from sklearn.compose import ColumnTransformer
@@ -35,11 +34,11 @@ class OSolver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        rng = np.random.RandomState(self.params['seed'])
         X, X_val, y, y_val = train_test_split(
             X_train, y_train, test_size=self.params['test_size'],
-            random_state=rng
+            random_state=self.params['seed']
         )
+
         self.X_train, self.y_train = X, y
         self.X_val, self.y_val = X_val, y_val
         self.cat_ind = categorical_indicator
