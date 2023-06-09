@@ -67,8 +67,8 @@ class OSolver(BaseSolver):
         }
         model = self.model.set_params(**params)
         model.fit(self.X_train, self.y_train)
-        y_pred = model.predict(self.X_test)
-        accuracy = accuracy_score(self.y_test, y_pred)
+        y_pred = model.predict(self.X_val)
+        accuracy = accuracy_score(self.y_val, y_pred)
 
         return accuracy
 
