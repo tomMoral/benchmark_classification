@@ -5,10 +5,8 @@ from benchopt import BaseDataset, safe_import_context
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
-    import numpy as np
-    from sklearn.model_selection import train_test_split
-
     from benchopt.datasets import make_correlated_data
+    import numpy as np
 
 
 # All datasets must be named `Dataset` and inherit from `BaseDataset`
@@ -25,8 +23,7 @@ class Dataset(BaseDataset):
             (1000, 500),
             (5000, 200),
         ],
-        'test_size': [0.25],
-        'seed': [27],
+        'seed': [27]
     }
 
     def get_data(self):
@@ -36,17 +33,16 @@ class Dataset(BaseDataset):
 
         # Generate pseudorandom data using `numpy`.
         rng = np.random.RandomState(self.seed)
-        X, y, _ = make_correlated_data(self.n_samples, self.n_features)
+        X, y, _ = make_correlated_data(
+            self.n_samples, self.n_features, random_state=rng
+        )
         y = y > 0
 
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=self.test_size, random_state=rng
-        )
         cat_indicator = [False]*X.shape[1]
 
         # The dictionary defines the keyword arguments for `Objective.set_data`
         return dict(
-            X_train=X_train, y_train=y_train,
-            X_test=X_test, y_test=y_test,
-            categorical_ind=cat_indicator
+            X=X,
+            y=y,
+            categorical_indicator=cat_indicator
         )

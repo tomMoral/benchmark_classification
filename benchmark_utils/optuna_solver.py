@@ -11,6 +11,7 @@ with safe_import_context() as import_ctx:
     from sklearn.preprocessing import OneHotEncoder as OHE
     from sklearn.metrics import accuracy_score
     from sklearn.dummy import DummyClassifier
+    from sklearn.model_selection import train_test_split
 
 
 # The benchmark solvers must be named `Solver` and
@@ -19,8 +20,13 @@ class OSolver(BaseSolver):
 
     stopping_criterion = SufficientProgressCriterion(strategy='callback')
 
+    params = {
+        'test_size': 0.25,
+        'seed': 42,
+    }
+
     def set_objective(
-            self, X_train, y_train, X_test, y_test,
+            self, X_train, y_train,
             categorical_indicator
     ):
         # Define the information received by each solver from the objective.
@@ -28,8 +34,13 @@ class OSolver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        self.X_train, self.y_train = X_train, y_train
-        self.X_test, self.y_test = X_test, y_test
+        X, X_val, y, y_val = train_test_split(
+            X_train, y_train, test_size=self.params['test_size'],
+            random_state=self.params['seed']
+        )
+
+        self.X_train, self.y_train = X, y
+        self.X_val, self.y_val = X_val, y_val
         self.cat_ind = categorical_indicator
         size = self.X_train.shape[1]
         preprocessor = ColumnTransformer(
@@ -55,8 +66,8 @@ class OSolver(BaseSolver):
         }
         model = self.model.set_params(**params)
         model.fit(self.X_train, self.y_train)
-        y_pred = model.predict(self.X_test)
-        accuracy = accuracy_score(self.y_test, y_pred)
+        y_pred = model.predict(self.X_val)
+        accuracy = accuracy_score(self.y_val, y_pred)
 
         return accuracy
 
