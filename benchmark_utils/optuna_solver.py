@@ -6,8 +6,6 @@ from benchopt.stopping_criterion import SufficientProgressCriterion
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import optuna
-    import numpy as np
-    from scipy import stats
     from sklearn.pipeline import Pipeline
     from sklearn.compose import ColumnTransformer
     from sklearn.preprocessing import OneHotEncoder as OHE
@@ -41,7 +39,7 @@ class OSolver(BaseSolver):
         # It is customizable for each benchmark.
         X, X_val, y, y_val = train_test_split(
             X_train, y_train, test_size=self.params['test_size'],
-            random_state=self.params['seed']
+            random_state=self.params['seed'], stratify=y_train
         )
 
         self.X_train, self.y_train = X, y

@@ -42,7 +42,8 @@ class Objective(BaseObjective):
         # API to pass data. This is customizable for each benchmark.
         rng = np.random.RandomState(self.seed)
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=self.test_size, random_state=rng
+            X, y, test_size=self.test_size, random_state=rng,
+            stratify=y
         )
         self.X_train, self.y_train = X_train, y_train
         self.X_test, self.y_test = X_test, y_test

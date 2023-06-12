@@ -5,7 +5,7 @@ with safe_import_context() as import_ctx:
     from scipy import stats
     from sklearn.metrics import accuracy_score
 
-    
+
 class AverageClassifier:
     """
     Return the average predictions

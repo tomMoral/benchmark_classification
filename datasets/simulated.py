@@ -27,7 +27,7 @@ class Dataset(BaseDataset):
     }
 
     test_parameters = {
-        'n_samples, n_features': [(10,5)]
+        'n_samples, n_features': [(100, 5)]
     }
 
     def get_data(self):
