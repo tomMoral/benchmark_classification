@@ -22,7 +22,7 @@ class AverageClassifier:
         for e in self.estimators:
             y_pred.append(e.predict(X_test))
         y_pred = np.array(y_pred)
-        y_pred = stats.mode(y_pred, keepdims=True)[0][0]
+        y_pred = stats.mode(y_pred, keepdims=False)[0]
 
         return y_pred
 
