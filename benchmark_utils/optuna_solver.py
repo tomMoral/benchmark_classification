@@ -6,13 +6,15 @@ from benchopt.stopping_criterion import SufficientProgressCriterion
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import optuna
+    import numpy as np
+    from scipy import stats
     from sklearn.pipeline import Pipeline
     from sklearn.compose import ColumnTransformer
     from sklearn.preprocessing import OneHotEncoder as OHE
     from sklearn.model_selection import cross_validate
     from sklearn.dummy import DummyClassifier
-    import numpy as np
-    from scipy import stats
+    from sklearn.model_selection import train_test_split
+    from .average_clf import AverageClassifier
 
 
 # The benchmark solvers must be named `Solver` and
@@ -23,8 +25,13 @@ class OSolver(BaseSolver):
         strategy='callback'
     )
 
+    params = {
+        'test_size': 0.25,
+        'seed': 42,
+    }
+
     def set_objective(
-            self, X_train, y_train, X_test, y_test,
+            self, X_train, y_train,
             categorical_indicator
     ):
         # Define the information received by each solver from the objective.
@@ -32,8 +39,13 @@ class OSolver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        self.X_train, self.y_train = X_train, y_train
-        self.X_test, self.y_test = X_test, y_test
+        X, X_val, y, y_val = train_test_split(
+            X_train, y_train, test_size=self.params['test_size'],
+            random_state=self.params['seed']
+        )
+
+        self.X_train, self.y_train = X, y
+        self.X_val, self.y_val = X_val, y_val
         self.cat_ind = categorical_indicator
         size = self.X_train.shape[1]
         preprocessor = ColumnTransformer(
@@ -73,7 +85,7 @@ class OSolver(BaseSolver):
         study = optuna.create_study(direction="maximize", sampler=sampler)
         while callback(best_model):
             study.optimize(self.objective, n_trials=10)
-            best_model = AvgClf(
+            best_model = AverageClassifier(
                 study.best_trial.user_attrs['model']
             )
         self.clf = best_model
@@ -87,35 +99,3 @@ class OSolver(BaseSolver):
 
     def warmup_solver(self):
         pass
-
-
-class AvgClf(OSolver):
-    def __init__(self, estimators):
-        self.estimators = estimators
-
-    def predict(self, X_test):
-        y_pred = []
-        for e in self.estimators:
-            y_pred.append(e.predict(X_test))
-        y_pred = np.array(y_pred)
-        y_pred = stats.mode(y_pred, keepdims=True)[0][0]
-
-        return y_pred
-
-    def predict_proba(self, X_test):
-        y_pred = []
-        for e in self.estimators:
-            y_pred.append(e.predict_proba(X_test))
-        y_pred = np.array(y_pred)
-        y_pred = np.mean(y_pred, axis=0)
-
-        return y_pred
-
-    def score(self, X, y):
-        cpt = 0
-        length = y.shape
-        y_pred = self.predict(X)
-        for i in range(length[0]):
-            if y[i] == y_pred[i]:
-                cpt += 1
-        return cpt/length[0]

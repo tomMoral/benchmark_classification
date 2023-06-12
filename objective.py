@@ -85,7 +85,5 @@ class Objective(BaseObjective):
         return dict(
             X_train=self.X_train,
             y_train=self.y_train,
-            X_test=self.X_test,
-            y_test=self.y_test,
             categorical_indicator=self.categorical_indicator
         )
