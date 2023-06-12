@@ -5,7 +5,7 @@ with safe_import_context() as import_ctx:
 
 
 DATASETS = {
-    'bank_marketing': 44126,
+    'bank-marketing': 44126,
     'california': 44090,
     'compass': 44162,
     'covertype': 44121,

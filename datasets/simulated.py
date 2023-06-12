@@ -26,6 +26,10 @@ class Dataset(BaseDataset):
         'seed': [27]
     }
 
+    test_parameters = {
+        'n_samples, n_features': [(100, 5)]
+    }
+
     def get_data(self):
         # The return arguments of this function are passed as keyword arguments
         # to `Objective.set_data`. This defines the benchmark's

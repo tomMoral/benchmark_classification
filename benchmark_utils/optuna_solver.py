@@ -9,16 +9,19 @@ with safe_import_context() as import_ctx:
     from sklearn.pipeline import Pipeline
     from sklearn.compose import ColumnTransformer
     from sklearn.preprocessing import OneHotEncoder as OHE
-    from sklearn.metrics import accuracy_score
+    from sklearn.model_selection import cross_validate
     from sklearn.dummy import DummyClassifier
     from sklearn.model_selection import train_test_split
+    from .average_clf import AverageClassifier
 
 
 # The benchmark solvers must be named `Solver` and
 # inherit from `BaseSolver` for `benchopt` to work properly.
 class OSolver(BaseSolver):
 
-    stopping_criterion = SufficientProgressCriterion(strategy='callback')
+    stopping_criterion = SufficientProgressCriterion(
+        strategy='callback'
+    )
 
     params = {
         'test_size': 0.25,
@@ -36,7 +39,7 @@ class OSolver(BaseSolver):
         # It is customizable for each benchmark.
         X, X_val, y, y_val = train_test_split(
             X_train, y_train, test_size=self.params['test_size'],
-            random_state=self.params['seed']
+            random_state=self.params['seed'], stratify=y_train
         )
 
         self.X_train, self.y_train = X, y
@@ -65,11 +68,12 @@ class OSolver(BaseSolver):
             f"model__{p}": v for p, v in param.items()
         }
         model = self.model.set_params(**params)
-        model.fit(self.X_train, self.y_train)
-        y_pred = model.predict(self.X_val)
-        accuracy = accuracy_score(self.y_val, y_pred)
+        cross_score = cross_validate(
+            model, self.X_train, self.y_train, return_estimator=True
+        )
+        trial.set_user_attr('model', cross_score['estimator'])
 
-        return accuracy
+        return cross_score['test_score'].mean()
 
     def run(self, callback):
         # This is the function that is called to evaluate the solver.
@@ -79,11 +83,10 @@ class OSolver(BaseSolver):
         study = optuna.create_study(direction="maximize", sampler=sampler)
         while callback(best_model):
             study.optimize(self.objective, n_trials=10)
-            best = {
-                f"model__{p}": v for p, v in study.best_params.items()
-            }
-            best_model = self.model.set_params(**best)
-            self.clf = best_model.fit(self.X_train, self.y_train)
+            best_model = AverageClassifier(
+                study.best_trial.user_attrs['model']
+            )
+        self.clf = best_model
 
     def get_result(self):
         # Return the result from one optimization run.
