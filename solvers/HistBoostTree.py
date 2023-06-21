@@ -15,9 +15,15 @@ class Solver(OSolver):
         return HistGradientBoostingClassifier()
 
     def sample_parameters(self, trial):
-        max_iter = trial.suggest_int("max_iter", 100, 2000, step=10)
-        l_rate = trial.suggest_float("learning_rate", 1e-4, 1, log=True)
+        max_iter = trial.suggest_int("max_iter", 10, 2000, step=10)
+        l_rate = trial.suggest_float("learning_rate", 1e-2, 1, log=True)
+        max_leaf_nodes = trial.suggest_int("max_leaf_nodes", 3, 300, log=True)
+        min_samples_leaf = trial.suggest_int(
+            "min_samples_leaf", 1, 300, log=True
+        )
         return dict(
             max_iter=max_iter,
-            learning_rate=l_rate
+            learning_rate=l_rate,
+            max_leaf_nodes=max_leaf_nodes,
+            min_samples_leaf=min_samples_leaf
         )
