@@ -21,8 +21,17 @@ class Solver(OSolver):
     def get_model(self):
         return SVC(probability=True)
 
+    def skip(self, X_train, y_train, categorical_indicator):
+        if X_train.shape[0] > 5000:
+            return True, "Too large for SVC"
+        return False, None
+
     def sample_parameters(self, trial):
-        c = trial.suggest_float("C", 1e-1, 1e1, log=True)
-        return dict(
-            C=c
+        params = {}
+        params['C'] = trial.suggest_float("C", 1e-1, 1e1, log=True)
+        params['kernel'] = trial.suggest_categorical(
+            "kernel", ["linear", "rbf", "poly"]
         )
+        if params['kernel'] == 'rbf' or params['kernel'] == 'poly':
+            params['gamma'] = trial.suggest_float("gamma", 1e-4, 1, log=True)
+        return params
