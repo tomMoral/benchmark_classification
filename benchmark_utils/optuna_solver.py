@@ -97,8 +97,8 @@ class OSolver(BaseSolver):
         # it is customizable for each benchmark.
         return self.clf
 
-    @staticmethod
-    def get_next(n_iter):
+    def get_next(self, n_iter):
+
         return n_iter + 1
 
     def warmup_solver(self):
