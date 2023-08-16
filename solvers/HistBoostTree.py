@@ -10,7 +10,9 @@ class Solver(OSolver):
 
     name = 'HistGradientBoostingClassifier'
     requirements = ["pip:optuna"]
-
+    extra_model_params = {
+        "preprocessor__one_hot__sparse_output": False
+    }
     def get_model(self):
         return HistGradientBoostingClassifier()
 
