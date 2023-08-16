@@ -13,6 +13,7 @@ class Solver(OSolver):
     extra_model_params = {
         "preprocessor__one_hot__sparse_output": False
     }
+
     def get_model(self):
         return HistGradientBoostingClassifier()
 
