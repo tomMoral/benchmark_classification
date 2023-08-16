@@ -16,13 +16,15 @@ class Solver(OSolver):
         return XGBClassifier()
 
     def sample_parameters(self, trial):
-        n_estimators = trial.suggest_int("n_estimators", 10, 2000, step=10)
-        max_depth = trial.suggest_int("max_depth", 1, 11, step=1)
-        l_rate = trial.suggest_float("learning_rate", 1e-4, 1, log=True)
-        l2 = trial.suggest_float("reg_lambda", 1e-8, 1e-1, log=True)
+        n_estimators = trial.suggest_int("max_iter", 10, 2000, step=10)
+        l_rate = trial.suggest_float("learning_rate", 1e-2, 1, log=True)
+        max_leaves = trial.suggest_int("max_leaf_nodes", 3, 300, log=True)
+        min_child_weight = trial.suggest_int(
+            "min_samples_leaf", 1, 300, log=True
+        )
         return dict(
             n_estimators=n_estimators,
-            max_depth=max_depth,
             learning_rate=l_rate,
-            reg_lambda=l2
+            max_leaves=max_leaves,
+            min_child_weight=min_child_weight
         )
