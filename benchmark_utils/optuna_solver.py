@@ -88,7 +88,8 @@ class OSolver(BaseSolver):
             best_model = AverageClassifier(
                 study.best_trial.user_attrs['model']
             )
-        self.clf = best_model
+        self.best = study.best_params
+        self.clf = self.get_model().set_params(**self.best).fit(self.X_train, self.y_train)
 
     def get_result(self):
         # Return the result from one optimization run.
