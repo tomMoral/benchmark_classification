@@ -20,13 +20,15 @@ with safe_import_context() as import_ctx:
 class OSolver(BaseSolver):
 
     stopping_criterion = SufficientProgressCriterion(
-        strategy='callback'
+        strategy='callback', patience=5
     )
 
     params = {
         'test_size': 0.25,
         'seed': 42,
     }
+
+    extra_model_params = {}
 
     def set_objective(
             self, X_train, y_train,
@@ -47,15 +49,14 @@ class OSolver(BaseSolver):
         self.cat_ind = categorical_indicator
         size = self.X_train.shape[1]
         preprocessor = ColumnTransformer(
-                    [("one_hot", OHE(categories="auto",
-                                     handle_unknown="ignore"),
-                     [i for i in range(size) if self.cat_ind[i]]),
-                     (
-                        "numerical",
-                        "passthrough",
-                        [i for i in range(size) if not self.cat_ind[i]],
-                    )]
-                )
+            [
+                ("one_hot", OHE(
+                        categories="auto", handle_unknown="ignore",
+                    ), [i for i in range(size) if self.cat_ind[i]]),
+                ("numerical", "passthrough",
+                 [i for i in range(size) if not self.cat_ind[i]],)
+            ]
+        )
         gm = self.get_model()
         self.model = Pipeline(
             steps=[("preprocessor", preprocessor),
@@ -64,9 +65,10 @@ class OSolver(BaseSolver):
 
     def objective(self, trial):
         param = self.sample_parameters(trial)
-        params = {
+        params = self.extra_model_params.copy()
+        params.update({
             f"model__{p}": v for p, v in param.items()
-        }
+        })
         model = self.model.set_params(**params)
         cross_score = cross_validate(
             model, self.X_train, self.y_train, return_estimator=True
@@ -86,7 +88,10 @@ class OSolver(BaseSolver):
             best_model = AverageClassifier(
                 study.best_trial.user_attrs['model']
             )
-        self.clf = best_model
+        self.best = study.best_params
+        self.clf = self.get_model().set_params(
+            **self.best
+        ).fit(self.X_train, self.y_train)
 
     def get_result(self):
         # Return the result from one optimization run.
@@ -94,6 +99,10 @@ class OSolver(BaseSolver):
         # This defines the benchmark's API for solvers' results.
         # it is customizable for each benchmark.
         return self.clf
+
+    def get_next(self, n_iter):
+
+        return n_iter + 1
 
     def warmup_solver(self):
         pass
