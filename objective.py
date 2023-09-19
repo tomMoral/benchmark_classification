@@ -17,6 +17,8 @@ class Objective(BaseObjective):
 
     # Name to select the objective in the CLI and to display the results.
     name = "Classification"
+    url = "https://github.com/tommoral/benchmark_classification"
+
     is_convex = False
 
     requirements = ["scikit-learn"]
@@ -32,7 +34,7 @@ class Objective(BaseObjective):
 
     # Minimal version of benchopt required to run this benchmark.
     # Bump it up if the benchmark depends on a new feature of benchopt.
-    min_benchopt_version = "1.3.2"
+    min_benchopt_version = "1.5"
 
     def set_data(
             self, X, y,
@@ -50,7 +52,7 @@ class Objective(BaseObjective):
         self.X_test, self.y_test = X_test, y_test
         self.categorical_indicator = categorical_indicator
 
-    def compute(self, model):
+    def evaluate_result(self, model):
         # The arguments of this function are the outputs of the
         # `Solver.get_result`. This defines the benchmark's API to pass
         # solvers' result. This is customizable for each benchmark.
@@ -73,10 +75,10 @@ class Objective(BaseObjective):
             value=1-score_test
         )
 
-    def get_one_solution(self):
+    def get_one_result(self):
         # Return one solution. The return value should be an object compatible
         # with `self.compute`. This is mainly for testing purposes.
-        return DummyClassifier().fit(self.X_train, self.y_train)
+        return dict(model=DummyClassifier().fit(self.X_train, self.y_train))
 
     def get_objective(self):
         # Define the information to pass to each solver to run the benchmark.
