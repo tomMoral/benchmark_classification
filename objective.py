@@ -19,6 +19,8 @@ class Objective(BaseObjective):
     name = "Classification"
     url = "https://github.com/tommoral/benchmark_classification"
 
+    is_convex = False
+
     requirements = ["scikit-learn"]
 
     # List of parameters for the objective. The benchmark will consider

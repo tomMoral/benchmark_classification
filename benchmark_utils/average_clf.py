@@ -21,7 +21,8 @@ class AverageClassifier:
         y_pred = []
         for e in self.estimators:
             y_pred.append(e.predict(X_test))
-        y_pred = np.array(y_pred)
+        # convert boolean to 0 & 1 for stats.mode
+        y_pred = np.array(y_pred).astype(int)
         y_pred = stats.mode(y_pred, keepdims=False)[0]
 
         return y_pred
