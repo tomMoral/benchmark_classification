@@ -79,21 +79,20 @@ class OSolver(BaseSolver):
         # This is the function that is called to evaluate the solver.
         # It runs the algorithm for a given a number of iterations `n_iter`.
         sampler = optuna.samplers.RandomSampler()
-        best_model = DummyClassifier().fit(self.X_train, self.y_train)
+        self.best_model = DummyClassifier().fit(self.X_train, self.y_train)
         study = optuna.create_study(direction="maximize", sampler=sampler)
-        while callback(best_model):
+        while callback():
             study.optimize(self.objective, n_trials=10)
-            best_model = AverageClassifier(
+            self.best_model = AverageClassifier(
                 study.best_trial.user_attrs['model']
             )
-        self.clf = best_model
 
     def get_result(self):
         # Return the result from one optimization run.
         # The outputs of this function are the arguments of `Objective.compute`
         # This defines the benchmark's API for solvers' results.
         # it is customizable for each benchmark.
-        return self.clf
+        return dict(model=self.best_model)
 
     def warmup_solver(self):
         pass
