@@ -31,7 +31,7 @@ class OSolver(BaseSolver):
     extra_model_params = {}
 
     def set_objective(
-            self, X_train, y_train,
+            self, X_train, y_train, X_val, y_val,
             categorical_indicator
     ):
         # Define the information received by each solver from the objective.
@@ -39,12 +39,7 @@ class OSolver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        X, X_val, y, y_val = train_test_split(
-            X_train, y_train, test_size=self.params['test_size'],
-            random_state=self.params['seed'], stratify=y_train
-        )
-
-        self.X_train, self.y_train = X, y
+        self.X_train, self.y_train = X_train, y_train
         self.X_val, self.y_val = X_val, y_val
         self.cat_ind = categorical_indicator
         size = self.X_train.shape[1]
@@ -70,12 +65,9 @@ class OSolver(BaseSolver):
             f"model__{p}": v for p, v in param.items()
         })
         model = self.model.set_params(**params)
-        cross_score = cross_validate(
-            model, self.X_train, self.y_train, return_estimator=True
-        )
-        trial.set_user_attr('model', cross_score['estimator'])
-
-        return cross_score['test_score'].mean()
+        res = model.fit(self.X_train, self.y_train)
+        trial.set_user_attr('model', res)
+        return res.score(self.X_val, self.y_val)
 
     def run(self, callback):
         # This is the function that is called to evaluate the solver.
@@ -85,9 +77,7 @@ class OSolver(BaseSolver):
         study = optuna.create_study(direction="maximize", sampler=sampler)
         while callback():
             study.optimize(self.objective, n_trials=10)
-            self.best_model = AverageClassifier(
-                study.best_trial.user_attrs['model']
-            )
+            self.best_model = study.best_trial.user_attrs['model']
 
     def get_result(self):
         # Return the result from one optimization run.
