@@ -28,7 +28,7 @@ class Objective(BaseObjective):
     # All parameters 'p' defined here are available as 'self.p'.
     # This means the OLS objective will have a parameter `self.whiten_y`.
     parameters = {
-        'seed': np.arange(100),
+        'seed': list(range(100)),
         'test_size': [0.25],
     }
 

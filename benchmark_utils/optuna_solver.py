@@ -6,9 +6,6 @@ from benchopt.stopping_criterion import SufficientProgressCriterion
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import optuna
-    from sklearn.pipeline import Pipeline
-    from sklearn.compose import ColumnTransformer
-    from sklearn.preprocessing import OneHotEncoder as OHE
     from sklearn.model_selection import cross_validate
     from sklearn.dummy import DummyClassifier
     from sklearn.model_selection import train_test_split
@@ -42,21 +39,9 @@ class OSolver(BaseSolver):
         self.X_train, self.y_train = X_train, y_train
         self.X_val, self.y_val = X_val, y_val
         self.cat_ind = categorical_indicator
-        size = self.X_train.shape[1]
-        preprocessor = ColumnTransformer(
-            [
-                ("one_hot", OHE(
-                        categories="auto", handle_unknown="ignore",
-                    ), [i for i in range(size) if self.cat_ind[i]]),
-                ("numerical", "passthrough",
-                 [i for i in range(size) if not self.cat_ind[i]],)
-            ]
-        )
-        gm = self.get_model()
-        self.model = Pipeline(
-            steps=[("preprocessor", preprocessor),
-                   ("model", gm)]
-        )
+        
+        self.model = self.get_model() #Includes preprocessor
+        
 
     def objective(self, trial):
         param = self.sample_parameters(trial)
