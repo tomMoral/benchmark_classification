@@ -1,5 +1,6 @@
 from benchopt import safe_import_context
 from benchmark_utils.optuna_solver import OSolver
+from benchopt.stopping_criterion import SufficientProgressCriterion
 
 with safe_import_context() as import_ctx:
     import optuna  # noqa: F401
@@ -11,11 +12,15 @@ class Solver(OSolver):
     name = 'dummy'
     requirements = ["pip:optuna"]
 
-    def get_model(self):
-        return DummyClassifier()
+    stopping_criterion = SufficientProgressCriterion(
+        strategy='callback', patience=200
+    )
 
-    def sample_parameters(self, trial):
-        strategy = trial.suggest_categorical("strategy", ["most_frequent", "prior", "stratified", "uniform"])
+    def get_model(self):
+        return DummyClassifier(strategy='uniform')
+
+    def sample_parameters(self, trial): 
+        seed = trial.suggest_int("seed", 0, 2**31)
         return dict(
-            strategy=strategy
+            random_state=seed
         )

@@ -9,10 +9,8 @@ with safe_import_context() as import_ctx:
     from sklearn.pipeline import Pipeline
     from sklearn.compose import ColumnTransformer
     from sklearn.preprocessing import OneHotEncoder as OHE
-    from sklearn.model_selection import cross_validate
+    from sklearn.base import clone
     from sklearn.dummy import DummyClassifier
-    from sklearn.model_selection import train_test_split
-    from .average_clf import AverageClassifier
 
 
 # The benchmark solvers must be named `Solver` and
@@ -64,7 +62,7 @@ class OSolver(BaseSolver):
         params.update({
             f"model__{p}": v for p, v in param.items()
         })
-        model = self.model.set_params(**params)
+        model = clone(self.model).set_params(**params)
         res = model.fit(self.X_train, self.y_train)
         trial.set_user_attr('model', res)
         return res.score(self.X_val, self.y_val)
