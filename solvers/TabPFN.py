@@ -5,7 +5,9 @@ with safe_import_context() as import_ctx:
     from sklearn.pipeline import Pipeline
     from sklearn.compose import ColumnTransformer
     from sklearn.preprocessing import OrdinalEncoder
+    from sklearn.model_selection import train_test_split
     from tabpfn import TabPFNClassifier
+    import torch
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
@@ -25,7 +27,7 @@ class Solver(BaseSolver):
 
     # List of packages needed to run the solver. See the corresponding
     # section in objective.py
-    requirements = ['sklearn']
+    requirements = ['sklearn', 'pip:torch', 'pip:tabpfn']
 
     # Force solver to run only once if you don't want to record training steps
     sampling_strategy = "run_once"
@@ -42,7 +44,12 @@ class Solver(BaseSolver):
         self.X_train, self.y_train = X_train, y_train
         self.X_val, self.y_val = X_val, y_val
         self.cat_ind = categorical_indicator
+        train_size = 1024
+        if self.X_train.shape[0] > train_size:
+            self.X_train, _, self.y_train, _ = train_test_split(self.X_train, self.y_train, test_size=self.X_train.shape[0] - train_size, stratify=self.y_train)
+        
         size = self.X_train.shape[1]
+
         self.preprocessor = ColumnTransformer(
             [
                 ("one_hot", OrdinalEncoder(
@@ -53,7 +60,7 @@ class Solver(BaseSolver):
             ]
         )
         self.model = Pipeline(steps= [("preprocessor", self.preprocessor),
-                                  ("model", TabPFNClassifier())])
+                                  ("model", TabPFNClassifier(device='cuda' if torch.cuda.is_available() else 'cpu')])
 
     def run(self, n_iter):
         # This is the function that is called to fit the model.
