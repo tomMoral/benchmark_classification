@@ -60,7 +60,7 @@ class Solver(BaseSolver):
             ]
         )
         self.model = Pipeline(steps= [("preprocessor", self.preprocessor),
-                                  ("model", TabPFNClassifier(device='cuda' if torch.cuda.is_available() else 'cpu')])
+                                  ("model", TabPFNClassifier(device='cuda' if torch.cuda.is_available() else 'cpu'))])
 
     def run(self, n_iter):
         # This is the function that is called to fit the model.
