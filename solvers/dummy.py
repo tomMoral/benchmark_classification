@@ -20,9 +20,6 @@ class Solver(OSolver):
     )
 
     def get_model(self):
-<<<<<<< HEAD
-        return DummyClassifier(strategy='uniform')
-=======
         size = self.X_train.shape[1]
         preprocessor = ColumnTransformer(
             [
@@ -36,7 +33,6 @@ class Solver(OSolver):
         return Pipeline(steps= [("preprocessor", preprocessor),
                                   ("model", DummyClassifier())])
 
->>>>>>> e269da2777d1d095ab9d9e17355fe54233efb246
 
     def sample_parameters(self, trial): 
         seed = trial.suggest_int("seed", 0, 2**31)

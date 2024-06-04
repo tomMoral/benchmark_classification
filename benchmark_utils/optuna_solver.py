@@ -6,14 +6,10 @@ from benchopt.stopping_criterion import SufficientProgressCriterion
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import optuna
-<<<<<<< HEAD
     from sklearn.pipeline import Pipeline
     from sklearn.compose import ColumnTransformer
     from sklearn.preprocessing import OneHotEncoder as OHE
     from sklearn.base import clone
-=======
-    from sklearn.model_selection import cross_validate
->>>>>>> e269da2777d1d095ab9d9e17355fe54233efb246
     from sklearn.dummy import DummyClassifier
 
 
