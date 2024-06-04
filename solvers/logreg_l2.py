@@ -6,6 +6,9 @@ from benchmark_utils.optuna_solver import OSolver
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import optuna  # noqa: F401
+    from sklearn.pipeline import Pipeline
+    from sklearn.compose import ColumnTransformer
+    from sklearn.preprocessing import OneHotEncoder as OHE
     from sklearn.linear_model import LogisticRegression
 
 
@@ -22,14 +25,24 @@ class Solver(OSolver):
     }
 
     def get_model(self):
+        size = self.X_train.shape[1]
+        preprocessor = ColumnTransformer(
+            [
+                ("one_hot", OHE(
+                        categories="auto", handle_unknown="ignore",
+                    ), [i for i in range(size) if self.cat_ind[i]]),
+                ("numerical", "passthrough",
+                 [i for i in range(size) if not self.cat_ind[i]],)
+            ]
+        )
         solver = 'lbfgs'
         if self.penalty == 'l1':
             solver = 'liblinear'
         elif self.penalty == 'elasticnet':
             solver = 'saga'
-        return LogisticRegression(
-            penalty=self.penalty, solver=solver
-        )
+        return Pipeline(steps= [("preprocessor", preprocessor),
+                                  ("model", LogisticRegression(penalty=self.penalty, solver=solver))])
+    
 
     def sample_parameters(self, trial):
         params = {}

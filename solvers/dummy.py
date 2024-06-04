@@ -4,6 +4,9 @@ from benchopt.stopping_criterion import SufficientProgressCriterion
 
 with safe_import_context() as import_ctx:
     import optuna  # noqa: F401
+    from sklearn.pipeline import Pipeline
+    from sklearn.compose import ColumnTransformer
+    from sklearn.preprocessing import OneHotEncoder as OHE
     from sklearn.dummy import DummyClassifier
 
 
@@ -17,7 +20,23 @@ class Solver(OSolver):
     )
 
     def get_model(self):
+<<<<<<< HEAD
         return DummyClassifier(strategy='uniform')
+=======
+        size = self.X_train.shape[1]
+        preprocessor = ColumnTransformer(
+            [
+                ("one_hot", OHE(
+                        categories="auto", handle_unknown="ignore",
+                    ), [i for i in range(size) if self.cat_ind[i]]),
+                ("numerical", "passthrough",
+                 [i for i in range(size) if not self.cat_ind[i]],)
+            ]
+        )
+        return Pipeline(steps= [("preprocessor", preprocessor),
+                                  ("model", DummyClassifier())])
+
+>>>>>>> e269da2777d1d095ab9d9e17355fe54233efb246
 
     def sample_parameters(self, trial): 
         seed = trial.suggest_int("seed", 0, 2**31)

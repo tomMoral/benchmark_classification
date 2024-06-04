@@ -6,6 +6,9 @@ from benchmark_utils.optuna_solver import OSolver
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import optuna  # noqa: F401
+    from sklearn.pipeline import Pipeline
+    from sklearn.compose import ColumnTransformer
+    from sklearn.preprocessing import OneHotEncoder as OHE
     from sklearn.svm import SVC
 
 
@@ -19,9 +22,20 @@ class Solver(OSolver):
     requirements = ["pip:optuna"]
 
     def get_model(self):
-        return SVC(probability=True)
+        size = self.X_train.shape[1]
+        preprocessor = ColumnTransformer(
+            [
+                ("one_hot", OHE(
+                        categories="auto", handle_unknown="ignore",
+                    ), [i for i in range(size) if self.cat_ind[i]]),
+                ("numerical", "passthrough",
+                 [i for i in range(size) if not self.cat_ind[i]],)
+            ]
+        )
+        return Pipeline(steps= [("preprocessor", preprocessor),
+                                  ("model", SVC(probability=True))])
 
-    def skip(self, X_train, y_train, categorical_indicator):
+    def skip(self, X_train, **kwargs):
         if X_train.shape[0] > 5000:
             return True, "Too large for SVC"
         return False, None
