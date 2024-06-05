@@ -29,7 +29,21 @@ DATASETS = {
         # 44161,  # road_safety
         # 44091,  # wine
         # 42803,
-        151,
+        151,      # electricity
+        44121,    # covertype
+        44122,    # pol
+        44123,    # house_16H
+        44124,    # kdd_ipums_la_97-small
+        44125,    # magictelescope
+        44126,    # bank-marketing
+        44127,    # phoneme
+        44128,    # MiniBooNE
+        44129,    # higgs
+        44130,    # eyemovements
+        44131,    # jannis
+        44089,    # credit
+        44090,    # california
+        44091,    # wine   
 }
 
 
