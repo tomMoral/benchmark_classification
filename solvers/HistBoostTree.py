@@ -3,7 +3,6 @@ from benchmark_utils.optuna_solver import OSolver
 
 with safe_import_context() as import_ctx:
     import optuna  # noqa: F401
-    from sklearn.pipeline import Pipeline
     from sklearn.ensemble import HistGradientBoostingClassifier
     from sklearn.pipeline import Pipeline
 
