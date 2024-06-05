@@ -7,7 +7,7 @@ with safe_import_context() as import_ctx:
 
 DATASETS = {
     'covertype': 44121,
-    #'covertype_categorical': 44159,
+    # 'covertype_categorical': 44159,
 }
 
 
@@ -31,8 +31,8 @@ class Dataset(BaseDataset):
         )
 
         # Downsample the data while maintaining the proportion of each label
-        X, _, y, _ = train_test_split(X, y, test_size=580012, stratify=y, random_state=42)
-
+        X, _, y, _ = train_test_split(X, y, test_size=580012, stratify=y,
+                                      random_state=42)
 
         return dict(
             X=X,

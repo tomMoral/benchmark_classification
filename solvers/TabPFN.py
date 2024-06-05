@@ -1,4 +1,3 @@
-from benchopt import safe_import_context
 from benchopt import BaseSolver, safe_import_context
 
 with safe_import_context() as import_ctx:
@@ -8,6 +7,7 @@ with safe_import_context() as import_ctx:
     from sklearn.model_selection import train_test_split
     from tabpfn import TabPFNClassifier
     import torch
+
 
 # Protect the import with `safe_import_context()`. This allows:
 # - skipping import to speed up autocompletion in CLI.
@@ -46,25 +46,33 @@ class Solver(BaseSolver):
         self.cat_ind = categorical_indicator
         train_size = 1024
         if self.X_train.shape[0] > train_size:
-            self.X_train, _, self.y_train, _ = train_test_split(self.X_train, self.y_train, test_size=self.X_train.shape[0] - train_size, stratify=self.y_train)
-        
+            self.X_train, _, self.y_train, _ = train_test_split(
+                self.X_train, self.y_train,
+                test_size=self.X_train.shape[0]-train_size,
+                stratify=self.y_train)
+
         size = self.X_train.shape[1]
 
         self.preprocessor = ColumnTransformer(
             [
                 ("one_hot", OrdinalEncoder(
-                        categories="auto", handle_unknown="use_encoded_value",unknown_value=-1, #TODO: check if this is correct
+                    categories="auto", handle_unknown="use_encoded_value",
+                    unknown_value=-1,  # TODO: check if this is correct
                     ), [i for i in range(size) if self.cat_ind[i]]),
                 ("numerical", "passthrough",
                  [i for i in range(size) if not self.cat_ind[i]],)
             ]
         )
-        self.model = Pipeline(steps= [("preprocessor", self.preprocessor),
-                                  ("model", TabPFNClassifier(device='cuda' if torch.cuda.is_available() else 'cpu'))])
+        self.model = Pipeline(
+            steps=[("preprocessor", self.preprocessor),
+                   ("model", TabPFNClassifier(
+                       device='cuda' if torch.cuda.is_available() else 'cpu'
+                       ))])
 
     def run(self, n_iter):
         # This is the function that is called to fit the model.
-        # The param n_iter is defined if you change the sample strategy to other value than "run_once"
+        # The param n_iter is defined if you change the sample strategy to
+        # other value than "run_once"
         # https://benchopt.github.io/performance_curves.html
         self.model.fit(self.X_train, self.y_train)
 

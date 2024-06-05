@@ -30,11 +30,10 @@ class Solver(OSolver):
                  [i for i in range(size) if not self.cat_ind[i]],)
             ]
         )
-        return Pipeline(steps= [("preprocessor", preprocessor),
-                                  ("model", DummyClassifier())])
+        return Pipeline(steps=[("preprocessor", preprocessor),
+                               ("model", DummyClassifier())])
 
-
-    def sample_parameters(self, trial): 
+    def sample_parameters(self, trial):
         seed = trial.suggest_int("seed", 0, 2**31)
         return dict(
             random_state=seed

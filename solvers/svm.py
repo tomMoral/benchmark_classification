@@ -32,8 +32,8 @@ class Solver(OSolver):
                  [i for i in range(size) if not self.cat_ind[i]],)
             ]
         )
-        return Pipeline(steps= [("preprocessor", preprocessor),
-                                  ("model", SVC(probability=True))])
+        return Pipeline(steps=[("preprocessor", preprocessor),
+                               ("model", SVC(probability=True))])
 
     def skip(self, X_train, **kwargs):
         if X_train.shape[0] > 5000:

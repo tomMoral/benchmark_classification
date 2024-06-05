@@ -25,8 +25,8 @@ class Solver(OSolver):
                  [i for i in range(size) if not self.cat_ind[i]],)
             ]
         )
-        return Pipeline(steps= [("preprocessor", preprocessor),
-                                  ("model", ExtraTreesClassifier())])
+        return Pipeline(steps=[("preprocessor", preprocessor),
+                               ("model", ExtraTreesClassifier())])
 
     def sample_parameters(self, trial):
         n_estimators = trial.suggest_int("n_estimators", 10, 200, step=10)

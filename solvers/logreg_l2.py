@@ -40,9 +40,9 @@ class Solver(OSolver):
             solver = 'liblinear'
         elif self.penalty == 'elasticnet':
             solver = 'saga'
-        return Pipeline(steps= [("preprocessor", preprocessor),
-                                  ("model", LogisticRegression(penalty=self.penalty, solver=solver))])
-    
+        return Pipeline(steps=[("preprocessor", preprocessor),
+                               ("model", LogisticRegression(
+                                   penalty=self.penalty, solver=solver))])
 
     def sample_parameters(self, trial):
         params = {}
