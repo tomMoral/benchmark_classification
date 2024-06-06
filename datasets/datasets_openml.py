@@ -44,7 +44,7 @@ class Dataset(BaseDataset):
 
     def get_data(self):
         dataset = openml.datasets.get_dataset(
-            DATASET[self.dataset]
+            DATASETS[self.dataset]
         )
         X, y, cat_indicator, attribute_names = dataset.get_data(
             dataset_format="dataframe", target=dataset.default_target_attribute
