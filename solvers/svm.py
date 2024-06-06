@@ -19,7 +19,7 @@ class Solver(OSolver):
     # Name to select the solver in the CLI and to display the results.
     name = 'SVM'
 
-    requirements = ["pip:optuna"]
+    requirements = ["pip:optuna", "pip:scikit-learn"]
 
     def get_model(self):
         size = self.X_train.shape[1]

@@ -13,7 +13,7 @@ with safe_import_context() as import_ctx:
 class Solver(OSolver):
 
     name = 'dummy'
-    requirements = ["pip:optuna"]
+    requirements = ["pip:optuna", "pip:scikit-learn"]
 
     stopping_criterion = SufficientProgressCriterion(
         strategy='callback', patience=200

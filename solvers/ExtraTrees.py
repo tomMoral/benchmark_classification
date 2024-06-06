@@ -12,7 +12,7 @@ with safe_import_context() as import_ctx:
 class Solver(OSolver):
 
     name = 'ExtraTrees'
-    requirements = ["pip:optuna"]
+    requirements = ["pip:optuna", "pip:scikit-learn"]
 
     def get_model(self):
         size = self.X_train.shape[1]
