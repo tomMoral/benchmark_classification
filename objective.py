@@ -21,7 +21,7 @@ class Objective(BaseObjective):
 
     is_convex = False
 
-    requirements = ["scikit-learn"]
+    requirements = ["pip:scikit-learn"]
 
     # List of parameters for the objective. The benchmark will consider
     # the cross product for each key in the dictionary.

@@ -6,44 +6,30 @@ with safe_import_context() as import_ctx:
 
 
 DATASETS = {
-        # 44126,  # bank-marketing
-        # 44090,  # california
+        44126,  # bank-marketing
+        44090,  # california
         # 44162,  # compass
-        # 44121,  # covertype
+        44121,  # covertype
         # 44159,  # covertype_categorical
-        # 44089,  # credit
-        # 44120,  # electricity
+        44089,  # credit
+        # 151,  # electricity
+        44120,  # electricity
         # 44156,  # electricity_categorical
-        # 44130,  # eyemovements
+        44130,  # eyemovements
         # 44156,  # eyemovements_categorical
-        # 44129,  # higgs
-        # 44123,  # house_16H
-        # 44131,  # jannis
+        44129,  # higgs
+        44123,  # house_16H
+        44131,  # jannis
         # 44186,  # KDDCup06_upselling
-        # 44124,  # kdd_ipums_la_97-small
-        # 44125,  # magictelescope
-        # 44128,  # MiniBooNE
-        # 44127,  # phoneme
-        # 44122,  # pol
+        44124,  # kdd_ipums_la_97-small
+        44125,  # magictelescope
+        44128,  # MiniBooNE
+        44127,  # phoneme
+        44122,  # pol
         # 44160,  # rl
         # 44161,  # road_safety
-        # 44091,  # wine
-        # 42803,
-        151,      # electricity
-        44121,    # covertype
-        44122,    # pol
-        44123,    # house_16H
-        44124,    # kdd_ipums_la_97-small
-        44125,    # magictelescope
-        44126,    # bank-marketing
-        44127,    # phoneme
-        44128,    # MiniBooNE
-        44129,    # higgs
-        44130,    # eyemovements
-        44131,    # jannis
-        44089,    # credit
-        44090,    # california
-        44091,    # wine
+        # 42803,  # road-safety
+        44091,  # wine
 }
 
 

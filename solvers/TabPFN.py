@@ -27,7 +27,7 @@ class Solver(BaseSolver):
 
     # List of packages needed to run the solver. See the corresponding
     # section in objective.py
-    requirements = ['sklearn', 'pip:torch', 'pip:tabpfn']
+    requirements = ['pip:torch', 'pip:tabpfn']
 
     # Force solver to run only once if you don't want to record training steps
     sampling_strategy = "run_once"
