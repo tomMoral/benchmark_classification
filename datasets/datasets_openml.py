@@ -50,13 +50,9 @@ class Dataset(BaseDataset):
         X, y, cat_indicator, attribute_names = dataset.get_data(
             dataset_format="dataframe", target=dataset.default_target_attribute
         )
-        # convert int and object to categories
-        # TODO: handle cases where categorical cardinality is > 255
-        # (this is not supported using HGBT native categorical handling)
-        for col in X.columns:
-            is_integer = pd.api.types.is_integer_dtype(X[col])
-            is_object = pd.api.types.is_object_dtype(X[col])
-            if is_integer or is_object:
+
+        for i, col in enumerate(X.columns):
+            if cat_indicator[i]:
                 X[col] = X[col].astype('category')
 
         return dict(
