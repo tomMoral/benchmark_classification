@@ -12,7 +12,7 @@ with safe_import_context() as import_ctx:
 class Solver(OSolver):
 
     name = 'RandomForest'
-    requirements = ["pip:optuna", "pip:scikit-learn"]
+    requirements = ["pip:optuna"]
 
     def get_model(self):
         size = self.X_train.shape[1]

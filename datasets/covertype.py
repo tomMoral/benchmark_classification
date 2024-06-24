@@ -16,10 +16,11 @@ class Dataset(BaseDataset):
     name = 'covertype'
 
     install_cmd = 'conda'
-    requirements = ["pip:chardet", "pip:openml", "pip:scikit-learn"]
+    requirements = ["pip:chardet", "pip:openml"]
 
     parameters = {
         "dataset": list(DATASETS),
+        "study_set_size": [1000],
     }
 
     def get_data(self):
@@ -31,8 +32,8 @@ class Dataset(BaseDataset):
         )
 
         # Downsample the data while maintaining the proportion of each label
-        X, _, y, _ = train_test_split(X, y, test_size=580012, stratify=y,
-                                      random_state=42)
+        X, _, y, _ = train_test_split(X, y, train_size=self.study_set_size,
+                                      stratify=y, random_state=42)
 
         return dict(
             X=X,

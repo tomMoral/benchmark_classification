@@ -21,13 +21,13 @@ class Solver(BaseSolver):
     # List of parameters for the solver. The benchmark will consider
     # the cross product for each key in the dictionary.
     # All parameters 'p' defined here are available as 'self.p'.
-    # parameters = {
-    #     'kernel': ['linear', 'poly', 'sigmoid'],
-    # }
+    parameters = {
+        'train_size': [1024],
+    }
 
     # List of packages needed to run the solver. See the corresponding
     # section in objective.py
-    requirements = ["pip:scikit-learn", "pip:tabpfn", "pip:torch"]
+    requirements = ["pip:tabpfn", "pip:torch"]
 
     # Force solver to run only once if you don't want to record training steps
     sampling_strategy = "run_once"
@@ -44,11 +44,10 @@ class Solver(BaseSolver):
         self.X_train, self.y_train = X_train, y_train
         self.X_val, self.y_val = X_val, y_val
         self.cat_ind = categorical_indicator
-        train_size = 1024
-        if self.X_train.shape[0] > train_size:
+        if self.X_train.shape[0] > self.train_size:
             self.X_train, _, self.y_train, _ = train_test_split(
                 self.X_train, self.y_train,
-                test_size=self.X_train.shape[0]-train_size,
+                test_size=self.X_train.shape[0]-self.train_size,
                 stratify=self.y_train)
 
         size = self.X_train.shape[1]

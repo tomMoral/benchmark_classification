@@ -8,9 +8,6 @@ class Dataset(BaseDataset):
 
     name = "iris"
 
-    install_cmd = 'conda'
-    requirements = ["pip:scikit-learn"]
-
     def get_data(self):
         X, y = load_iris(
             return_X_y=True

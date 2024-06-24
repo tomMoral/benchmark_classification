@@ -35,7 +35,7 @@ class Dataset(BaseDataset):
     name = 'openml'
 
     install_cmd = 'conda'
-    requirements = ["pip:chardet", "pip:openml", "pip:scikit-learn"]
+    requirements = ["pip:chardet", "pip:openml"]
 
     parameters = {
         "dataset": list(DATASETS),

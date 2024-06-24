@@ -10,7 +10,7 @@ with safe_import_context() as import_ctx:
 class Solver(OSolver):
 
     name = 'HistGradientBoostingClassifier'
-    requirements = ["pip:optuna", "pip:scikit-learn"]
+    requirements = ["pip:optuna"]
     extra_model_params = {
     }
 
