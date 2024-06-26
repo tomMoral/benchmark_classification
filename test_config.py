@@ -10,4 +10,6 @@ def check_test_solver_install(solver_class):
     particular architecture, call pytest.xfail when
     detecting the situation.
     """
-    pass
+    is_platform_macOS = sys.platform == "darwin"
+    if is_platform_macOS and solver_class.name == "TabPFN":
+        pytest.skip("Running TabPFN on MacOS takes a lot of time.")
