@@ -1,18 +1,23 @@
 from benchopt import safe_import_context
 from benchmark_utils.optuna_solver import OSolver
+from benchopt.stopping_criterion import SufficientProgressCriterion
 
 with safe_import_context() as import_ctx:
     import optuna  # noqa: F401
     from sklearn.pipeline import Pipeline
     from sklearn.compose import ColumnTransformer
     from sklearn.preprocessing import OneHotEncoder as OHE
-    from sklearn.ensemble import ExtraTreesClassifier
+    from sklearn.dummy import DummyClassifier
 
 
 class Solver(OSolver):
 
-    name = 'ExtraTrees'
+    name = 'dummy'
     requirements = ["pip:optuna"]
+
+    stopping_criterion = SufficientProgressCriterion(
+        strategy='callback', patience=200
+    )
 
     def get_model(self):
         size = self.X_train.shape[1]
@@ -26,10 +31,10 @@ class Solver(OSolver):
             ]
         )
         return Pipeline(steps=[("preprocessor", preprocessor),
-                               ("model", ExtraTreesClassifier())])
+                               ("model", DummyClassifier())])
 
     def sample_parameters(self, trial):
-        n_estimators = trial.suggest_int("n_estimators", 10, 200, step=10)
+        seed = trial.suggest_int("seed", 0, 2**31)
         return dict(
-            n_estimators=n_estimators
+            random_state=seed
         )

@@ -4,6 +4,7 @@ from benchmark_utils.optuna_solver import OSolver
 with safe_import_context() as import_ctx:
     import optuna  # noqa: F401
     from sklearn.ensemble import HistGradientBoostingClassifier
+    from sklearn.pipeline import Pipeline
 
 
 class Solver(OSolver):
@@ -11,11 +12,12 @@ class Solver(OSolver):
     name = 'HistGradientBoostingClassifier'
     requirements = ["pip:optuna"]
     extra_model_params = {
-        "preprocessor__one_hot__sparse_output": False
     }
 
     def get_model(self):
-        return HistGradientBoostingClassifier()
+        return Pipeline(steps=[("preprocessor", "passthrough"),
+                               ("model", HistGradientBoostingClassifier(
+                                   categorical_features="from_dtype"))])
 
     def sample_parameters(self, trial):
         max_iter = trial.suggest_int("max_iter", 10, 2000, step=10)

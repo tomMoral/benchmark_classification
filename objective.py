@@ -4,11 +4,11 @@ from benchopt import BaseObjective, safe_import_context
 # - skipping import to speed up autocompletion in CLI.
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
+    import numpy as np
     from sklearn.dummy import DummyClassifier
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import balanced_accuracy_score as BAS
     from sklearn.metrics import roc_auc_score as RAS
-    import numpy as np
 
 
 # The benchmark objective must be named `Objective` and
@@ -21,14 +21,14 @@ class Objective(BaseObjective):
 
     is_convex = False
 
-    requirements = ["scikit-learn"]
+    requirements = ["pip:scikit-learn"]
 
     # List of parameters for the objective. The benchmark will consider
     # the cross product for each key in the dictionary.
     # All parameters 'p' defined here are available as 'self.p'.
     # This means the OLS objective will have a parameter `self.whiten_y`.
     parameters = {
-        'seed': [42],
+        'seed': list(range(100)),
         'test_size': [0.25],
     }
 
@@ -48,7 +48,14 @@ class Objective(BaseObjective):
             X, y, test_size=self.test_size, random_state=rng,
             stratify=y
         )
+
+        X_train, X_val, y_train, y_val = train_test_split(
+            X_train, y_train, test_size=0.25,
+            random_state=rng, stratify=y_train
+        )
+
         self.X_train, self.y_train = X_train, y_train
+        self.X_val, self.y_val = X_val, y_val
         self.X_test, self.y_test = X_test, y_test
         self.categorical_indicator = categorical_indicator
 
@@ -58,6 +65,7 @@ class Objective(BaseObjective):
         # solvers' result. This is customizable for each benchmark.
         score_train = model.score(self.X_train, self.y_train)
         score_test = model.score(self.X_test, self.y_test)
+        score_val = model.score(self.X_val, self.y_val)
         bl_acc = BAS(self.y_test, model.predict(self.X_test))
         pred = model.predict_proba(self.X_test)
         if len(np.unique(self.y_test)) > 2:
@@ -70,6 +78,7 @@ class Objective(BaseObjective):
         return dict(
             score_test=score_test,
             score_train=score_train,
+            score_val=score_val,
             balanced_accuracy=bl_acc,
             roc_auc_score=roc_score,
             value=1-score_test
@@ -89,5 +98,7 @@ class Objective(BaseObjective):
         return dict(
             X_train=self.X_train,
             y_train=self.y_train,
+            X_val=self.X_val,
+            y_val=self.y_val,
             categorical_indicator=self.categorical_indicator
         )

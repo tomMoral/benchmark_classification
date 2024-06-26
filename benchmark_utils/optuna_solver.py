@@ -6,13 +6,8 @@ from benchopt.stopping_criterion import SufficientProgressCriterion
 # - getting requirements info when all dependencies are not installed.
 with safe_import_context() as import_ctx:
     import optuna
-    from sklearn.pipeline import Pipeline
-    from sklearn.compose import ColumnTransformer
-    from sklearn.preprocessing import OneHotEncoder as OHE
-    from sklearn.model_selection import cross_validate
+    from sklearn.base import clone
     from sklearn.dummy import DummyClassifier
-    from sklearn.model_selection import train_test_split
-    from .average_clf import AverageClassifier
 
 
 # The benchmark solvers must be named `Solver` and
@@ -31,7 +26,7 @@ class OSolver(BaseSolver):
     extra_model_params = {}
 
     def set_objective(
-            self, X_train, y_train,
+            self, X_train, y_train, X_val, y_val,
             categorical_indicator
     ):
         # Define the information received by each solver from the objective.
@@ -39,29 +34,11 @@ class OSolver(BaseSolver):
         # `Objective.get_objective`. This defines the benchmark's API for
         # passing the objective to the solver.
         # It is customizable for each benchmark.
-        X, X_val, y, y_val = train_test_split(
-            X_train, y_train, test_size=self.params['test_size'],
-            random_state=self.params['seed'], stratify=y_train
-        )
-
-        self.X_train, self.y_train = X, y
+        self.X_train, self.y_train = X_train, y_train
         self.X_val, self.y_val = X_val, y_val
         self.cat_ind = categorical_indicator
-        size = self.X_train.shape[1]
-        preprocessor = ColumnTransformer(
-            [
-                ("one_hot", OHE(
-                        categories="auto", handle_unknown="ignore",
-                    ), [i for i in range(size) if self.cat_ind[i]]),
-                ("numerical", "passthrough",
-                 [i for i in range(size) if not self.cat_ind[i]],)
-            ]
-        )
-        gm = self.get_model()
-        self.model = Pipeline(
-            steps=[("preprocessor", preprocessor),
-                   ("model", gm)]
-        )
+
+        self.model = self.get_model()  # Includes preprocessor
 
     def objective(self, trial):
         param = self.sample_parameters(trial)
@@ -69,13 +46,10 @@ class OSolver(BaseSolver):
         params.update({
             f"model__{p}": v for p, v in param.items()
         })
-        model = self.model.set_params(**params)
-        cross_score = cross_validate(
-            model, self.X_train, self.y_train, return_estimator=True
-        )
-        trial.set_user_attr('model', cross_score['estimator'])
-
-        return cross_score['test_score'].mean()
+        model = clone(self.model).set_params(**params)
+        res = model.fit(self.X_train, self.y_train)
+        trial.set_user_attr('model', res)
+        return res.score(self.X_val, self.y_val)
 
     def run(self, callback):
         # This is the function that is called to evaluate the solver.
@@ -85,9 +59,7 @@ class OSolver(BaseSolver):
         study = optuna.create_study(direction="maximize", sampler=sampler)
         while callback():
             study.optimize(self.objective, n_trials=10)
-            self.best_model = AverageClassifier(
-                study.best_trial.user_attrs['model']
-            )
+            self.best_model = study.best_trial.user_attrs['model']
 
     def get_result(self):
         # Return the result from one optimization run.

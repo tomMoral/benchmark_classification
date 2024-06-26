@@ -35,7 +35,7 @@ class Dataset(BaseDataset):
     name = 'openml'
 
     install_cmd = 'conda'
-    requirements = ["pip:openml", "pip:chardet"]
+    requirements = ["pip:chardet", "pip:openml"]
 
     parameters = {
         "dataset": list(DATASETS),
@@ -43,11 +43,16 @@ class Dataset(BaseDataset):
 
     def get_data(self):
         dataset = openml.datasets.get_dataset(
-            self.dataset
+            DATASETS[self.dataset], download_data=True,
+            download_qualities=True, download_features_meta_data=True
         )
         X, y, cat_indicator, attribute_names = dataset.get_data(
-            dataset_format="array", target=dataset.default_target_attribute
+            dataset_format="dataframe", target=dataset.default_target_attribute
         )
+
+        for i, col in enumerate(X.columns):
+            if cat_indicator[i]:
+                X[col] = X[col].astype('category')
 
         return dict(
             X=X,
